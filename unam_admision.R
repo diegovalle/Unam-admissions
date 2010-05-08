@@ -104,11 +104,21 @@ readFile <- function(filename) {
                               "factor"))
 }
 
-analyzeUNAM <- function(filename, title.majors, title.campuses){
-    area <- readFile(filename)
-    makeTable(area, filename)
-    graphMajors(area, title.majors , filename)
-    graphCampus(area, title.campuses, filename)
+newAnalyzeThis <- function(){
+    allareas <- data.frame()
+    list(
+         analyze = function(filename, title.majors, title.campuses) {
+            area <- readFile(filename)
+            allareas <<- rbind(allareas, area)
+            makeTable(area, filename)
+            graphMajors(area, title.majors , filename)
+            graphCampus(area, title.campuses, filename)
+            return(NULL)
+         },
+         result = function() {
+             cleanData(allareas)
+         }
+    )
 }
 
 ########################################################
@@ -124,26 +134,23 @@ title.campuses <- c("Physical Sciences, Mathematics and Engineering, by Educatio
                     "Social Sciences, by Educational Establishment",
                     "Humanities and Arts, by Educational Establishment")
 
-mapply(analyzeUNAM, filenames, title.majors, title.campuses)
-
-
+analyzeUNAM <- newAnalyzeThis()
+mapply(analyzeUNAM$analyze, filenames, title.majors, title.campuses)
+allareas <- analyzeUNAM$result()
 
 
 ########################################################
 #Some basic statistics
 ########################################################
-allareas <- lapply(filenames, readFile)
-allareas <- rbind(allareas[[1]], allareas[[2]],
-                  allareas[[3]], allareas[[4]])
-allareas <- cleanData(allareas)
 
-#Number Accepted and Rejected 7690 + 98241
+
+#Number Accepted and Rejected (7690 + 98241)
 ddply(allareas,.(Accepted),function(df) nrow(df))
 #Average score of those Accepted
 ddply(allareas,.(Accepted),function(df) mean(df$Score, na.rm=TRUE))
 #Wooow, that's a lot of people with high scores who were rejected,
 #maybe instead of appling to med school they should have studied
-#social science
+#some social science, hahaha
 ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
       function(df) nrow(df))
 ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
