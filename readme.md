@@ -15,25 +15,25 @@ The UNAM has various educational establishments throughout Mexico City
 ("planteles" which I translated as campuses). As you can see in the
 charts, the one located in CU is by far the best one:
 
-![Mathy](http://imgur.com/OGRAI.png)
+![Mathy](http://imgur.com/LgXD0.png)
 
 There are a bunch of Faculties in CU which we can rank individualy and
 compare to the other campuses:
 
-![Mathy](http://imgur.com/4lQXt.png)
+![Mathy](http://imgur.com/k9sdX.png)
 
 Here are the results for the Health Sciences. Med School is full of smart people.
 
-![Health](http://imgur.com/zCje1.png)
+![Health](http://imgur.com/9LNVc.png)
 
-![Health](http://imgur.com/QhHu5.png)
+![Health](http://imgur.com/e1Nw4.png)
 
 Do smart students earn more?
 ------------------------------
 
 The average score of the different majors in the admission exam predicts their starting salaries. Though if you're smart enough to study mechatronics you'd be better of studying medicine, not only will you get a better salary, you'll command more respect ;)
 
-![](http://imgur.com/71oe5.png)
+![](http://imgur.com/jKsUt.png)
 
 Is the UNAM really the best school in Mexico?
 ------------------------------------------------
@@ -41,11 +41,11 @@ Is the UNAM really the best school in Mexico?
 The highest scoring major with more than 15 students is medicine. The
 Faculty of Medicine located in CU has the best students by far:
 
-![](http://imgur.com/FGia2.png)
+![](http://imgur.com/8LDI7.png)
 
 To enter an internship at a hospital students at all universities  have to take an exam called ENARM, and while the UNAM certainly does better than average (the chart only includes the top scoring schools), it is not by any means the best scoring school.
 
-![](http://imgur.com/ag4ig.png)
+![](http://imgur.com/6edwK.png)
 
 At the Faculty of Medicine 47% percent passed the ENARM, at the FES Zaragosa 33%, while at the
 FES Iztacla only 27%. If we assume the
@@ -70,6 +70,6 @@ Sources
 
 [UNAM Admission Results](https://servicios.dgae.unam.mx/Febrero2009/resultados/index.html)
 
-Salaries: Newspaper Reforma
+Salaries: Reforma Newspaper
 
 [ENARM Results](http://www.scribd.com/doc/16624058/universidades)

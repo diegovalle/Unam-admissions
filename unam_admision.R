@@ -45,7 +45,8 @@ graphMajors <- function(area.df, title="", filename) {
       stat_summary(fun.data = "mean_cl_boot",width=.3,size=.75) +
       stat_summary(fun.data = "mean_cl_boot",color=I("black"),
                    geom="point",size=3) +
-      ylab("Aciertos") + xlab("") + opts(title=title) + theme_bw()
+      ylab("Number of correct answers") + xlab("") +
+          opts(title=title) + theme_bw()
   ggsave(file = paste("output/", filename, "_maj.png", sep = ""),
          dpi=72, width=3.3, height=2.05, scale=4)
 }
@@ -61,7 +62,7 @@ graphCampus <- function(area.df, title="", filename) {
                   position=position_jitter(width = .15)) +
          stat_summary(fun.data = "mean_cl_boot", color = I("red"),
                       width = .3,size = .75) +
-         ylab("Aciertos") +
+         ylab("Number of correct answers") +
          xlab("") +
          coord_flip() +
          opts(title = title) + theme_bw()
@@ -235,6 +236,7 @@ ggplot(area.ac.MC, aes(x = Correct, fill = Campus, color = Campus)) +
        xlab("Number of correct answers") +
        geom_vline(xintercept = scores[1], linetype = 2,
                   color = "gray80") +
+       opts(title = "Distribution of Med Students Test Scores")
        theme_bw()
 ggsave(file = "output/density_unam.png",
          dpi=72, width=2.5, height=1.5, scale=4)
@@ -261,7 +263,7 @@ ggplot(enarm, aes(University, X)) +
     geom_linerange(aes(ymax = X + e, ymin = X -e), color = "red") +
     geom_point() +
     coord_flip() +
-    opts(title = "Percentage of students who passed the ENARM 2008") +
+    opts(title = "Percentage of students who passed the ENARM in 2008") +
     ylab("")
 ggsave(file = "output/uni_ranked.png",
          dpi=72, width=1.5, height=1.5, scale=4)
