@@ -188,8 +188,8 @@ majors <- c("MEDICO.*", "INGENIERIA EN COMPUTA",
             "ADMIN","COMUNICACION","CONTAD" )
 scores <- sapply(majors, avscore, allareas.cu.a)
 salaries <- c(13364,12636,10969,10902,10870,10821,9747,9708,9704,9567,9372,8151)
-ss <- data.frame(scores, salaries)
-ggplot(ss, aes(scores, salaries, label = rownames(ss))) +
+ss <- data.frame(scores, log.salaries = log(salaries))
+ggplot(ss, aes(scores, log.salaries, label = rownames(ss))) +
     geom_point() +
     geom_smooth(method = lm) +
     geom_text(hjust=-0.05, angle = -40) +
