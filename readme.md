@@ -38,7 +38,7 @@ The average score of the different majors in the admission exam predicts their s
 Is the UNAM really the best school in Mexico?
 ------------------------------------------------
 
-The highest scoring major with more than 15 students is medicine. The
+The highest scoring major with more than 20 students admitted is medicine. The
 Faculty of Medicine located in CU has the best students by far:
 
 ![](http://imgur.com/8LDI7.png)

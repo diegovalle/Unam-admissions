@@ -84,10 +84,10 @@ makeTable <- function(area.df, filename) {
                       llist(area.ac$Accepted,area.ac$Major,
                             area.ac$Faculty),
                       nrow)
-  colnames(min_score) <- c("Major","Location","Minimum score")
+  colnames(min_score) <- c("Major","Location","Cutoff.Score")
   min_score$Total.Students <- yieldA$area.ac + yieldR$area.re
   min_score$Accepted <- yieldA$area.ac
-  min_score$Percentage <- paste(round((yieldA$area.ac /
+  min_score$Acceptance.Rate <- paste(round((yieldA$area.ac /
                                        yieldR$area.re) * 100,
                                 digits = 1),"%", sep = "")
   write.csv(min_score[order(-min_score$Minimum),],
@@ -236,7 +236,7 @@ ggplot(area.ac.MC, aes(x = Correct, fill = Campus, color = Campus)) +
        xlab("Number of correct answers") +
        geom_vline(xintercept = scores[1], linetype = 2,
                   color = "gray80") +
-       opts(title = "Distribution of Med Students Test Scores")
+       opts(title = "Distribution of Med Students Test Scores") +
        theme_bw()
 ggsave(file = "output/density_unam.png",
          dpi=72, width=2.5, height=1.5, scale=4)
