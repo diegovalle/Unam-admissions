@@ -5,6 +5,7 @@
 #Some simple visualizations and statistics of the first (of two) admission exams to Mexico's biggest university
 
 library(ggplot2)
+library(directlabels)
 library(Hmisc)
 library(xtable)
 
@@ -61,7 +62,7 @@ graphCampus <- function(area.df, title="", filename) {
          geom_jitter(alpha = I(.2),
                   position=position_jitter(width = .15)) +
          stat_summary(fun.data = "mean_cl_boot", color = I("red"),
-                      width = .3,size = .75) +
+                      width = .4, geom = "crossbar") +
          ylab("Number of correct answers") +
          xlab("") +
          coord_flip() +
@@ -85,12 +86,12 @@ makeTable <- function(area.df, filename) {
                             area.ac$Faculty),
                       nrow)
   colnames(min_score) <- c("Major","Location","Cutoff.Score")
-  min_score$Total.Students <- yieldA$area.ac + yieldR$area.re
+  min_score$Total.Applied <- yieldA$area.ac + yieldR$area.re
   min_score$Accepted <- yieldA$area.ac
   min_score$Acceptance.Rate <- paste(round((yieldA$area.ac /
                                        yieldR$area.re) * 100,
                                 digits = 1),"%", sep = "")
-  write.csv(min_score[order(-min_score$Minimum),],
+  write.csv(min_score[order(-min_score$Cutoff.Score),],
             file = paste("output/", filename, ".csv", sep = ""),
             row.names = FALSE)
 #  print(xtable(min_score[order(-min_score$Minimo),]), type="html",
@@ -126,14 +127,14 @@ newAnalyzeThis <- function(){
 #Finally, the program
 ########################################################
 filenames <- c("AreaI", "AreaII", "AreaIII", "AreaIV")
-title.majors <- c("Mean score by major (95% CI), Physical Sciences, Mathematics and Engineering",
-                  "Mean score by major (95% CI), Biological Sciences and Health",
-                  "Mean score by major (95% CI), Social Sciences",
-                  "Mean score by major (95% CI), Humanities and Arts")
-title.campuses <- c("Physical Sciences, Mathematics and Engineering, by Educational Establishment",
-                    "Biological Sciences and Health, by Educational Establishment",
-                    "Social Sciences, by Educational Establishment",
-                    "Humanities and Arts, by Educational Establishment")
+title.majors <- c("Mean score by major (95% CI). Physical Sciences, Mathematics and Engineering",
+                  "Mean score by major (95% CI). Biological Sciences and Health",
+                  "Mean score by major (95% CI). Social Sciences",
+                  "Mean score by major (95% CI). Humanities and Arts")
+title.campuses <- c("Mean score by Educational Establishment (95% CI). Physical Sciences, Mathematics and Engineering",
+                    "Mean score by Educational Establishment (95% CI). Biological Sciences and Health",
+                    "Mean score by Educational Establishment (95% CI). Social Sciences",
+                    "Mean score by Educational Establishment (95% CI). Humanities and Arts")
 
 analyzeUNAM <- newAnalyzeThis()
 mapply(analyzeUNAM$analyze, filenames, title.majors, title.campuses)
@@ -157,8 +158,19 @@ ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
 ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
       function(df) mean(df$Score, na.rm=TRUE))
 
-
-
+ggplot(allareas, aes(Score, group = Accepted, fill = Accepted,
+                     color = Accepted)) +
+    geom_density(aes(y = ..count..), alpha =.4, binwidth = 1) +
+    xlab("Score") + ylab("Number of Students") +
+    annotate("text", x = 75, y = 2200, label = "Rejected",
+             color = "#00BFC4") +
+    annotate("text", x = 105, y = 270, label = "Accepted",
+             color = "#F8766D") +
+    theme_bw() +
+    #facet_wrap(~ Loc, scales = "free") +
+    opts(legend.position = "none")
+ggsave(file = "output/accepted-vs-rejected.png",
+         dpi=72, width=1.5, height=1.5, scale=4)
 
 ########################################################
 #Compare salaries with the entrace exam score
@@ -183,17 +195,17 @@ allareas.cu.a <- allareas.a[grep("FACULTAD",allareas.a$Faculty),]
 avscore <- function(str, df){
     mean(df[grep(str, df$Major),]$Score)
 }
-majors <- c("MEDICO.*", "INGENIERIA EN COMPUTA",
-            "DERECHO.*","MECATRON.*", "ARQUITEC.*","INGENIERIA CIVIL",
-            "INGENIERIA INDUS","PSICOLOG","RELACIONES INT",
-            "ADMIN","COMUNICACION","CONTAD" )
+majors <- c("MEDICO", "INGENIERIA EN COMPUTACION",
+            "DERECHO","MECATRONICA", "ARQUITECTO","INGENIERIA CIVIL",
+            "INGENIERIA INDUSTRIAL","PSICOLOGIA","RELACIONES INT",
+            "ADMINISTRACION","COMUNICACION","CONTADURIA" )
 scores <- sapply(majors, avscore, allareas.cu.a)
 salaries <- c(13364,12636,10969,10902,10870,10821,9747,9708,9704,9567,9372,8151)
 ss <- data.frame(scores, log.salaries = log(salaries))
 ggplot(ss, aes(scores, log.salaries, label = rownames(ss))) +
     geom_point() +
     geom_smooth(method = lm) +
-    geom_text(hjust=-0.05, angle = -40) +
+    geom_text(hjust=-0.05, angle = -40, size = 4) +
     coord_cartesian(xlim = c(75.5, 115)) +
     opts(title = "Starting Salary vs Entrance Exam Score")
 ggsave(file = "output/score_vs_salary.png",
@@ -231,7 +243,7 @@ area.ac.MC<-subset(area.ac,area.ac$Major=="MEDICO CIRUJANO" &
 colnames(area.ac.MC) <- c("Num", "Correct", "Accepted", "Major",
                           "Campus", "Loc")
 ggplot(area.ac.MC, aes(x = Correct, fill = Campus, color = Campus)) +
-       geom_density(alpha = 0.2, size=1,
+       geom_density(alpha = 0.4, size=1,
                     aes(y = ..density..))  +
        xlab("Number of correct answers") +
        geom_vline(xintercept = scores[1], linetype = 2,
@@ -268,3 +280,56 @@ ggplot(enarm, aes(University, X)) +
 ggsave(file = "output/uni_ranked.png",
          dpi=72, width=1.5, height=1.5, scale=4)
 
+
+grid.newpage()
+pushViewport(viewport(layout =  grid.layout(nrow = 2, ncol = 2)))
+
+subplot <- function(x, y) viewport(layout.pos.row = x,
+                                   layout.pos.col = y)
+
+
+
+enarm <- read.csv("data/enarm-2009.csv")
+enarm$per <- enarm$Passed / enarm$Students
+enarm$error <- sqrt((enarm$per * (1 - enarm$per)) / enarm$Students)
+
+enarm$University <- reorder(enarm$University, enarm$per)
+print(ggplot(enarm, aes(University, per)) +
+    scale_y_continuous(formatter = "percent") +
+    geom_linerange(aes(ymax = per + error, ymin = per - error),
+                   color = "red") +
+    geom_point() + xlab("") +
+    coord_flip() +
+    scale_y_continuous(formatter = "percent", limits = c(0, .95)) +
+    opts(title = "Percentage of students who passed the ENARM in 2009") +
+    ylab(""), vp = subplot(1, 1))
+
+print(ggplot(enarm, aes(English.Score, Medical.Score,
+                        label = University)) +
+    geom_text(hjust=-0.01, angle = -40, size = 3, alpha = .8) +
+    geom_point() +
+    geom_smooth(method = lm) +
+    opts(title = "Regression of Medical and English Scores"),
+    vp = subplot(1, 2))
+
+enarm$University <- reorder(enarm$University, enarm$English.Score)
+print(ggplot(enarm, aes(University, English.Score)) +
+    geom_point() +
+    coord_flip() + xlab("") +
+    opts(title = "Average English Score in the ENARM 2009") +
+    ylab(""), vp = subplot(2, 2))
+
+enarm$University <- reorder(enarm$University, enarm$Medical.Score)
+print(ggplot(enarm, aes(University, Medical.Score)) +
+    geom_point() +
+    coord_flip() + xlab("") +
+    opts(title = "Average Medical Score in the ENARM 2009") +
+    ylab(""), vp = subplot(2, 1))
+
+dev.print(png, "output/uni-enarm2009.png", width=800, height=600)
+#Fraud in the ENARM?
+#Secretaria de Marina, Escula Médico Naval 71 40 - 2007
+#4 1 - 2008
+40/71
+#Escuela Médico Militar Univ. Ejer y Fza Aerea 116 115 - 2007
+#2 0 - 2008

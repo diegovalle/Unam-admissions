@@ -60,8 +60,7 @@ rate than those of other public and private universities... Well,
 actually, different medical specialities (psychiatry, legal medicine,
 epidemiology, etc) have different pass rates, and god knows how they
 break down at each university. Plus this is only one major, for example, La Salle has a good reputation as a med school,
-but not so much for the other majors. Still it looks like pretty
-strong evidence against the UNAM being Mexico's best university.
+but not so much for the other majors. 
 
 It looks like the [high ranking attributed to the UNAM](http://en.wikipedia.org/wiki/National_Autonomous_University_of_Mexico#Rankings) in international comparisons is due to having over 200,000 students rather than because of an extremely high academic quality. Sort of like ranking Mexico above Switzerland because it has a higher GDP due to having 108,000,000 people to Switzerland's 7,000,0000. Total GDP is important, but GDP per Capita also matters.
 
@@ -72,4 +71,5 @@ Sources
 
 Salaries: Reforma Newspaper
 
-[ENARM Results](http://www.scribd.com/doc/16624058/universidades)
+[ENARM XXXI XXXII (2007-2008) Results](http://www.scribd.com/doc/16624058/universidades)
+[ENARM 2009 Results](http://enarm.salud.gob.mx/e33doctos/resultados/2009_ins_sel_res_uni_mex.php)
