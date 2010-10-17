@@ -61,7 +61,7 @@ graphMajors <- function(area.df, title="", filename) {
     p <- ggplot(aes(y=Score, x=Major, color=Campus, shape=Campus),
                 data=area.ac)
   } else {
-    p <- ggplot(aes(y=Score, x=Major, color=Campus), data=area.ac)
+    p <- ggplot(aes(y=Score, x=Major, color=Campus, group = Campus), data=area.ac)
   }
   p + opts(strip.text.y = theme_text())  +
       coord_flip() +
@@ -184,14 +184,17 @@ ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
 ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
       function(df) mean(df$Score, na.rm=TRUE))
 
+
 ggplot(allareas, aes(Score, group = Accepted, fill = Accepted,
                      color = Accepted)) +
     geom_density(aes(y = ..count..), alpha =.4, binwidth = 1) +
     xlab("Score") + ylab("Number of Students") +
     annotate("text", x = 75, y = 2200, label = "Rejected",
-             color = "#00BFC4") +
+             color = "#F8766D" ) +
     annotate("text", x = 105, y = 270, label = "Accepted",
-             color = "#F8766D") +
+             color = "#00BFC4") +
+    scale_color_manual(values = c("#00BFC4", "#F8766D")) +
+    scale_fill_manual(values = c("#00BFC4", "#F8766D")) +
     theme_bw() +
     opts(title = "UNAM - February Admission Exam, 2009") +
     #facet_wrap(~ Loc, scales = "free") +
@@ -231,6 +234,7 @@ salaries <- c(13364,12636,10969,10902,10870,10821,9747,9708,9704,9567,9372,8151)
 ss <- data.frame(scores, log.salaries = log(salaries))
 ggplot(ss, aes(scores, log.salaries, label = rownames(ss))) +
     geom_point() +
+    ylab("Number of correct answers") +
     geom_smooth(method = lm) +
     geom_text(hjust=-0.05, angle = -40, size = 4) +
     coord_cartesian(xlim = c(75.5, 115)) +
@@ -363,9 +367,14 @@ print(ggplot(enarm, aes(University, per)) +
     opts(title = "Percentage of students who passed the ENARM in 2009") +
     ylab("") +
     theme_bw(), vp = subplot(1, 1))
-enarm.unam <- subset(enarm.all, University %in% c("UNAM FM-CU",
-                                                 "UNAM FES Zaragoza",
-                                                 "UNAM FES Iztacala"))
+enarm.unam <- subset(enarm.all, University %in%
+                     c("UNAM FM-CU",
+                       "UNAM FES Zaragoza",
+                       "UNAM FES Iztacala",
+                       "Univ Panameriacana",
+                       "Univ La Salle",
+                       "Inst Tecnológico Est Sup Monterrey",
+                       "Univ. Aut. De Nuevo León"))
 print(ggplot(enarm.all, aes(Medical.Score, English.Score,
                         label = University)) +
     geom_text(data = enarm.unam, aes(Medical.Score, English.Score,
