@@ -53,7 +53,7 @@ graphMajors <- function(area.df, title="", filename) {
                          "Faculty", "Campus")
   area.ac <- ddply(area.ac, .(Major, Campus), transform,
                         median = median(Score))
-  area.ac <- ddply(x, .(Major), transform, median = max(median))
+  area.ac <- ddply(area.ac, .(Major), transform, median = max(median))
   area.ac$Major <- with(area.ac, reorder(Major, median))
 #  area.ac$Major<-factor(area.ac$Major, levels = levels(
  #                                     major$area.ac.Major))
@@ -180,6 +180,7 @@ ddply(allareas,.(Accepted),function(df) mean(df$Score, na.rm=TRUE))
 #some social science, hahaha
 ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
       function(df) nrow(df))
+3766 / (3924 + 3766)
 ddply(allareas[order(-allareas$Score), ][1:7690,], .(Accepted),
       function(df) mean(df$Score, na.rm=TRUE))
 
@@ -248,20 +249,25 @@ ggsave(file = "output/score_vs_salary.png",
 
 #If 47% percent of the students passed the ENARM what score would
 #be the equivalent in the admission exam
-enarm <- read.csv("data/enarm-2008.csv")
+enarm <- read.csv("data/enarm-2009.csv")
+enarm$prop <- enarm$Passed / enarm$Students
 area.ac<-subset(allareas, allareas$Accepted == "A")
 
 getMinScore <- function(Campus, df) {
     area.ac.F<-subset(df, Major == "MEDICO CIRUJANO" &
                           Faculty == Campus)
-    rown <- which(tolower(enarm$University) == tolower(Campus))
-    print(nrow(area.ac.F) * enarm[rown,]$X)
-    print(enarm[rown,]$X)
+    rown <- which(tolower(as.character(enarm$University)) == tolower(Campus))
+    print(nrow(area.ac.F) * enarm[rown,]$prop)
+    print(enarm[rown,]$prop)
     ordered <- area.ac.F$Score[order(-area.ac.F$Score)]
-    min(ordered[1:round(nrow(area.ac.F) * enarm[rown,]$X, digits=0)])
+    min(ordered[1:round(nrow(area.ac.F) * enarm[rown,]$prop,
+                        digits=0)])
 }
-facs <- c("FACULTAD DE MEDICINA", "FES IZTACALA", "FES ZARAGOZA")
+facs <- c("FACULTAD DE MEDICINA",
+          "FES IZTACALA",
+          "FES ZARAGOZA")
 scores <- sapply(facs, getMinScore, area.ac)
+
 
 area.ac.MC<-subset(area.ac,area.ac$Major=="MEDICO CIRUJANO" &
                    (area.ac$Faculty=="FACULTAD DE MEDICINA" |
@@ -274,7 +280,11 @@ ggplot(area.ac.MC, aes(x = Correct, fill = Campus, color = Campus)) +
                     aes(y = ..density..))  +
        xlab("Number of correct answers") +
        geom_vline(xintercept = scores[1], linetype = 2,
-                  color = "gray80") +
+                  color = "red", alpha = .3) +
+       geom_vline(xintercept = scores[2], linetype = 2,
+                  color = "green", alpha = .3) +
+       geom_vline(xintercept = scores[3], linetype = 2,
+                  color = "blue", alpha = .3) +
        opts(title = "Distribution of Med Students Admission Scores") +
        theme_bw()
 ggsave(file = "output/density_unam.png",
@@ -285,39 +295,32 @@ ggsave(file = "output/density_unam.png",
 perPass <- function(campus, area.ac){
     nrow(subset(area.ac,area.ac$Major == "MEDICO CIRUJANO" &
                    area.ac$Faculty == campus &
-                   area.ac$Score >= 106 )) /
+                   area.ac$Score >= scores[1] )) /
     nrow(subset(area.ac,area.ac$Major == "MEDICO CIRUJANO" &
                    area.ac$Faculty == campus ))
 }
 med <- c("FES IZTACALA", "FES ZARAGOZA", "FACULTAD DE MEDICINA")
 sapply(med, perPass, area.ac)
-enarm[1:3,]
+enarm
+scores
 
 
-
-enarm$e <- sqrt((enarm$X * (1 - enarm$X)) / enarm$Students)
-enarm$University <- reorder(enarm$University, enarm$X)
-ggplot(enarm, aes(University, X)) +
-    scale_y_continuous(formatter = "percent") +
-    geom_linerange(aes(ymax = X + e, ymin = X -e), color = "red") +
-    geom_point() +
-    coord_flip() +
-    opts(title = "Percentage of students who passed the ENARM in 2008") +
-    ylab("") +
-    theme_bw()
-ggsave(file = "output/uni_ranked.png",
-         dpi=72, width=1.5, height=1.5, scale=4)
+#enarm$e <- sqrt((enarm$prop * (1 - enarm$prop)) / enarm$Students)
+#enarm$University <- reorder(enarm$University, enarm$prop)
+#ggplot(enarm, aes(University, prop)) +
+#    scale_y_continuous(formatter = "percent") +
+#    geom_linerange(aes(ymax = prop + e, ymin = prop -e), color = "red") +
+#    geom_point() +
+#    coord_flip() +
+#    opts(title = "Percentage of students who passed the ENARM in 20089") +
+#    ylab("") +
+#    theme_bw()
+#ggsave(file = "output/uni_ranked.png",
+#         dpi=72, width=1.5, height=1.5, scale=4)
 
 ########################################################
 #ENARM
 ########################################################
-grid.newpage()
-pushViewport(viewport(layout =  grid.layout(nrow = 2, ncol = 2)))
-
-subplot <- function(x, y) viewport(layout.pos.row = x,
-                                   layout.pos.col = y)
-
-
 
 enarm.all <- read.csv("data/enarm-2009-all.csv")
 enarm.all$per <- ifelse(enarm.all$Passed > 0,
@@ -326,15 +329,26 @@ means <- sapply(enarm.all[,2:8], function(x) mean(x))
 wmeans <- sapply(enarm.all[,5:8],
                  function(x) weighted.mean(x, enarm.all$Test.Takers))
 means[["per"]];wmeans
-ggplot(enarm.all, aes(English.Score, Medical.Score,
+ggplot(enarm.all, aes(Medical.Score, English.Score,
                       label = University)) +
-    geom_point() +
-    geom_text(hjust=-0.01, angle = -40, size = 3, alpha = .8) +
-    geom_smooth(method = lm)
+    geom_point(aes(size = Test.Takers)) +
+    geom_text(hjust=-0.07, angle = -60, size = 3, alpha = .8) +
+    geom_smooth(method = lm) +
+    theme_bw()
+ggsave(file = "output/all-universities.png",
+         dpi=72, width=3.3, height=2.3, scale=4)
 
 enarm <- read.csv("data/enarm-2009.csv")
 enarm$per <- enarm$Passed / enarm$Students
 enarm$error <- sqrt((enarm$per * (1 - enarm$per)) / enarm$Students)
+
+
+
+grid.newpage()
+pushViewport(viewport(layout =  grid.layout(nrow = 2, ncol = 2)))
+
+subplot <- function(x, y) viewport(layout.pos.row = x,
+                                   layout.pos.col = y)
 
 enarm$University <- reorder(enarm$University, enarm$per)
 print(ggplot(enarm, aes(University, per)) +
@@ -349,13 +363,19 @@ print(ggplot(enarm, aes(University, per)) +
     opts(title = "Percentage of students who passed the ENARM in 2009") +
     ylab("") +
     theme_bw(), vp = subplot(1, 1))
-
-print(ggplot(enarm, aes(English.Score, Medical.Score,
+enarm.unam <- subset(enarm.all, University %in% c("UNAM FM-CU",
+                                                 "UNAM FES Zaragoza",
+                                                 "UNAM FES Iztacala"))
+print(ggplot(enarm.all, aes(Medical.Score, English.Score,
                         label = University)) +
-    geom_text(hjust=-0.01, angle = -40, size = 3, alpha = 1) +
-    geom_point() +
+    geom_text(data = enarm.unam, aes(Medical.Score, English.Score,
+                        label = University),
+              hjust=-0.09, angle = 0, size = 3, alpha = 1) +
+    geom_point(aes(size = Test.Takers)) +
     geom_smooth(method = lm) +
     opts(title = "Regression of Medical and English Scores") +
+    scale_x_continuous(limits = c(52.25, 64)) +
+    scale_y_continuous(limits = c(5.31, 8.3)) +
     theme_bw(),
     vp = subplot(1, 2))
 
@@ -380,37 +400,39 @@ print(ggplot(enarm, aes(University, Medical.Score)) +
     theme_bw(), vp = subplot(2, 1))
 
 dev.print(png, "output/uni-enarm2009.png", width=800, height=600)
+
 #Fraud in the ENARM?
 #Secretaria de Marina, Escula Médico Naval 71 40 - 2007
 #4 1 - 2008
 40/71
+1/4
 #Escuela Médico Militar Univ. Ejer y Fza Aerea 116 115 - 2007
 #2 0 - 2008
 
-filenames <- c("AreaI", "AreaII", "AreaIII", "AreaIV")
-filenamesF <- paste("data/", filenames, "Feb2010.csv", sep="")
-filenamesJ <- paste("data/", filenames, "Junio2010.csv", sep="")
+#filenames <- c("AreaI", "AreaII", "AreaIII", "AreaIV")
+#filenamesF <- paste("data/", filenames, "Feb2010.csv", sep="")
+#filenamesJ <- paste("data/", filenames, "Junio2010.csv", sep="")
 
 
-readFiles <- function(files) {
-  unam <- lapply(files, function(x) {
-                               t <- read.csv(x)
-                               names(t) <- c("Num","Score","Accepted","Major","Faculty")
-                               t
-                           })
-  unam <- rbind.fill(unam)
-  unam
-}
+#readFiles <- function(files) {
+#  unam <- lapply(files, function(x) {
+#                               t <- read.csv(x)
+#                               names(t) <- c("Num","Score","Accepted","Major","Faculty")
+#                               t
+#                           })
+#  unam <- rbind.fill(unam)
+#  unam
+#}
 
-unamF <- readFiles(filenamesF)
-unamF$date <- "Feb"
-unamJ <- readFiles(filenamesJ)
-unamJ$date <- "Jun"
-unam <- rbind(unamF, unamJ)
+#unamF <- readFiles(filenamesF)
+#unamF$date <- "Feb"
+#unamJ <- readFiles(filenamesJ)
+#unamJ$date <- "Jun"
+#unam <- rbind(unamF, unamJ)
 
 
-unam$score2 <- as.numeric(as.character(unam$Score))
-ddply(subset(unam, Accepted = "A"), .(Faculty),
-      function(df) mean(df$score2, na.rm = TRUE))
-max(unam$score2, na.rm = TRUE)
-fix(unam)
+#unam$score2 <- as.numeric(as.character(unam$Score))
+#ddply(subset(unam, Accepted = "A"), .(Faculty),
+#      function(df) mean(df$score2, na.rm = TRUE))
+#max(unam$score2, na.rm = TRUE)
+#fix(unam)
