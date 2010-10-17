@@ -9,6 +9,25 @@ library(directlabels)
 library(Hmisc)
 library(xtable)
 
+#Footnote function taken from:
+#http://www.r-bloggers.com/r-good-practice-%E2%80%93-adding-footnotes-to-graphics/
+# default footnote is today's date, cex=.7 (size) and color
+# is a kind of grey
+makeFootnote <- function(footnoteText=
+                         format(Sys.time(), "%d %b %Y"),
+                         size= .7, color= grey(.5))
+{
+   require(grid)
+   pushViewport(viewport())
+   grid.text(label= footnoteText ,
+             x = unit(1,"npc") - unit(2, "mm"),
+             y= unit(2, "mm"),
+             just=c("right", "bottom"),
+             gp=gpar(cex= size, col=color))
+   popViewport()
+}
+
+
 cleanData <- function(area.df) {
   area <- area.df
   colnames(area) <- c("Num","Score","Accepted","Major","Faculty")
@@ -67,7 +86,7 @@ graphMajors <- function(area.df, title="", filename) {
       coord_flip() +
       geom_jitter(alpha = I(.2),
                   position=position_jitter(width=.15)) +
-      stat_summary(size=.75, fun.data = median_cl_boot) +#
+      stat_summary(size=.75, fun.data = median_cl_boot, alpha=.8) +#
       stat_summary(fun.data = median_cl_boot, color=I("black"),
                    geom="point",size=3) +
       ylab("Number of correct answers") + xlab("") +
@@ -347,7 +366,31 @@ enarm$per <- enarm$Passed / enarm$Students
 enarm$error <- sqrt((enarm$per * (1 - enarm$per)) / enarm$Students)
 
 
+########################################################
+#Fraud
+########################################################
+names(enarm.all)
+ggplot(enarm.all, aes(Applicants - Test.Takers, Total.Score)) +
+#    geom_point() +
+    geom_text(aes(label = University), angle = 0, alpha = .8,
+              size = 3) +
+    stat_smooth(size = 1.2) +
+    opts(title = "Total Score in the ENARM vs Number of Students who Failed to Show Up for the Test")
+ggsave(file = "output/fraud.png",
+         dpi=72, width=2, height=1.5, scale=4)
+#Fraud in the ENARM?
+#Secretaria de Marina, Escula Médico Naval 71 40 - 2007
+#4 1 - 2008
+40/71
+1/4
+#Escuela Médico Militar Univ. Ejer y Fza Aerea 116 115 - 2007
+#2 0 - 2008
+115/116
+0
 
+########################################################
+#Multiple Charts
+########################################################
 grid.newpage()
 pushViewport(viewport(layout =  grid.layout(nrow = 2, ncol = 2)))
 
@@ -382,7 +425,7 @@ print(ggplot(enarm.all, aes(Medical.Score, English.Score,
               hjust=-0.09, angle = 0, size = 3, alpha = 1) +
     geom_point(aes(size = Test.Takers)) +
     geom_smooth(method = lm) +
-    opts(title = "Regression of Medical and English Scores") +
+    opts(title = "Regression of English and Medical Scores") +
     scale_x_continuous(limits = c(52.25, 64)) +
     scale_y_continuous(limits = c(5.31, 8.3)) +
     theme_bw(),
@@ -407,16 +450,11 @@ print(ggplot(enarm, aes(University, Medical.Score)) +
     opts(title = "Average Medical Score in the ENARM 2009") +
     ylab("") +
     theme_bw(), vp = subplot(2, 1))
-
+footnote <- paste(scriptName, format(Sys.time(), "%d %b %Y"),
+                  author, sep=" / ")
+makeFootnote("As you can see in the regression plot there were many schools that ranked above the FES Acatlan and FES Zaragoza, they were ommited to conserve space")
 dev.print(png, "output/uni-enarm2009.png", width=800, height=600)
 
-#Fraud in the ENARM?
-#Secretaria de Marina, Escula Médico Naval 71 40 - 2007
-#4 1 - 2008
-40/71
-1/4
-#Escuela Médico Militar Univ. Ejer y Fza Aerea 116 115 - 2007
-#2 0 - 2008
 
 #filenames <- c("AreaI", "AreaII", "AreaIII", "AreaIV")
 #filenamesF <- paste("data/", filenames, "Feb2010.csv", sep="")
