@@ -451,8 +451,7 @@ print(ggplot(enarm, aes(University, Medical.Score)) +
     opts(title = "Average Medical Score in the ENARM 2009") +
     ylab("") +
     theme_bw(), vp = subplot(2, 1))
-footnote <- paste(scriptName, format(Sys.time(), "%d %b %Y"),
-                  author, sep=" / ")
+
 makeFootnote("As you can see in the regression plot there were many schools that ranked above the FES Acatlan and FES Zaragoza, they were ommited to conserve space")
 dev.print(png, "output/uni-enarm2009.png", width=800, height=600)
 
