@@ -351,12 +351,12 @@ enarm.all$per <- ifelse(enarm.all$Passed > 0,
 means <- sapply(enarm.all[,2:8], function(x) mean(x))
 wmeans <- sapply(enarm.all[,5:8],
                  function(x) weighted.mean(x, enarm.all$Test.Takers))
-means[["per"]];wmeans
+means[["per"]];wmeans[["per"]]
 ggplot(enarm.all, aes(Medical.Score, English.Score,
                       label = University)) +
     geom_point(aes(size = Test.Takers)) +
-    geom_text(hjust=-0.07, angle = -60, size = 3, alpha = .8) +
-    geom_smooth(method = lm) +
+    geom_text(hjust=-0.07, angle = -50, size = 3, alpha = .8) +
+    geom_smooth(method = lm, aes(weight = Test.Takers)) +
     theme_bw()
 ggsave(file = "output/all-universities.png",
          dpi=72, width=3.3, height=2.3, scale=4)
@@ -369,16 +369,18 @@ enarm$error <- sqrt((enarm$per * (1 - enarm$per)) / enarm$Students)
 ########################################################
 #Fraud
 ########################################################
-names(enarm.all)
-ggplot(enarm.all, aes(Applicants - Test.Takers, Total.Score)) +
+ggplot(enarm.all, aes(1 - (Test.Takers / Applicants), Total.Score)) +
 #    geom_point() +
     geom_text(aes(label = University), angle = 0, alpha = .8,
               size = 3) +
-    stat_smooth(size = 1.2) +
-    opts(title = "Total Score in the ENARM vs Number of Students who Failed to Show Up for the Test")
+    ylab("Test Score") + xlab("Percentage who failed to show up") +
+    scale_x_continuous(formatter = "percent") +
+    stat_smooth(size = 1.2, aes(weight = Test.Takers), method = lm) +
+    opts(title = "Total Score in the ENARM vs Percentage of Students who Failed to Show Up for the Test")
 ggsave(file = "output/fraud.png",
          dpi=72, width=2, height=1.5, scale=4)
 #Fraud in the ENARM?
+#http://2.bp.blogspot.com/_7k_XUBT5vbU/SPknrBDqtrI/AAAAAAAAADk/mYcQ5PIlUGg/s800/enarm0708.bmp
 #Secretaria de Marina, Escula Médico Naval 71 40 - 2007
 #4 1 - 2008
 40/71
@@ -424,10 +426,9 @@ print(ggplot(enarm.all, aes(Medical.Score, English.Score,
                         label = University),
               hjust=-0.09, angle = 0, size = 3, alpha = 1) +
     geom_point(aes(size = Test.Takers)) +
-    geom_smooth(method = lm) +
+    geom_smooth(method = lm, aes(weight = Test.Takers)) +
     opts(title = "Regression of English and Medical Scores") +
-    scale_x_continuous(limits = c(52.25, 64)) +
-    scale_y_continuous(limits = c(5.31, 8.3)) +
+    coord_cartesian(xli = c(51.8, 64), ylim = c(5, 8.4)) +
     theme_bw(),
     vp = subplot(1, 2))
 
