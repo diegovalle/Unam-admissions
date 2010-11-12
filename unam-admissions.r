@@ -32,9 +32,11 @@ cleanData <- function(area.df) {
   area <- area.df
   colnames(area) <- c("Num","Score","Accepted","Major","Faculty")
   area$Major <- sub(".[0-9]+. +(.)[\n]*", "\\1", area$Major)
+  area$Major <- iconv(area$Major, "windows-1252", "utf-8")
   area$Faculty <- sub(".[0-9]+. +(.)[\n]*", "\\1", area$Faculty)
   area$Loc <- ifelse(substr(area$Faculty,1,8)=="FACULTAD",c("C.U."),
                    c(area$Faculty))
+
   #area.ac<-subset(area,area$Accepted=="A")
   area
 }
@@ -273,6 +275,8 @@ ggsave(file = "output/score_vs_salary.png",
 #If 47% percent of the students passed the ENARM what score would
 #be the equivalent in the admission exam
 enarm <- read.csv("data/enarm-2009.csv")
+enarm$University <- iconv(enarm$University, "windows-1252",
+                          "utf-8")
 enarm$prop <- enarm$Passed / enarm$Students
 area.ac<-subset(allareas, allareas$Accepted == "A")
 
@@ -301,7 +305,7 @@ colnames(area.ac.MC) <- c("Num", "Correct", "Accepted", "Major",
 ggplot(area.ac.MC, aes(x = Correct, fill = Campus, color = Campus)) +
        geom_density(alpha = 0.4, size=1,
                     aes(y = ..density..))  +
-       xlab("Number of correct answers") +
+       xlab("number of correct answers") +
        geom_vline(xintercept = scores[1], linetype = 2,
                   color = "red", alpha = .3) +
        geom_vline(xintercept = scores[2], linetype = 2,
@@ -346,6 +350,10 @@ scores
 ########################################################
 
 enarm.all <- read.csv("data/enarm-2009-all.csv")
+enarm.all$University <- iconv(enarm.all$University,
+                              "windows-1252",
+                              "utf-8")
+
 enarm.all$per <- ifelse(enarm.all$Passed > 0,
                     enarm.all$Passed / enarm.all$Test.Takers, 0)
 means <- sapply(enarm.all[,2:8], function(x) mean(x))
@@ -362,6 +370,9 @@ ggsave(file = "output/all-universities.png",
          dpi=72, width=3.3, height=2.3, scale=4)
 
 enarm <- read.csv("data/enarm-2009.csv")
+enarm$University <- iconv(enarm$University, "windows-1252",
+                          "utf-8")
+
 enarm$per <- enarm$Passed / enarm$Students
 enarm$error <- sqrt((enarm$per * (1 - enarm$per)) / enarm$Students)
 
