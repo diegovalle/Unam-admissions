@@ -228,19 +228,19 @@ ggsave(file = "output/accepted-vs-rejected.png",
 ########################################################
 #From Reforma:
 #Medicina: $13,364 pesos
-#Ingenier韆 en Sistemas: 12,636 pesos
+#Ingenier铆a en Sistemas: 12,636 pesos
 #Derecho: $10,969 pesos
-#Ingenier韆 Mecatr髇ica: $10,902 pesos
+#Ingenier铆a Mecatr贸nica: $10,902 pesos
 #Arquitectura: $10,870 pesos
-#Ingenier韆 Civil: $10,821 pesos
+#Ingenier铆a Civil: $10,821 pesos
 #Licenciado en Sistemas: $10,736 pesos
 #Mercadotecnia: $10,545 pesos
-#Ingenier韆 Industrial: $9,747 pesos
-#Psicolog韆: $9,708 pesos
+#Ingenier铆a Industrial: $9,747 pesos
+#Psicolog铆a: $9,708 pesos
 #Relaciones Internacionales: $9,704 pesos
-#Administraci髇: $9,567 pesos
-#Comunicaci髇: $9,372 pesos
-#Contadur韆: $8,151 pesos
+#Administraci贸n: $9,567 pesos
+#Comunicaci贸n: $9,372 pesos
+#Contadur铆a: $8,151 pesos
 allareas.a <- subset(allareas,Accepted == "A")
 allareas.cu.a <- allareas.a[grep("FACULTAD",allareas.a$Faculty),]
 avscore <- function(str, df){
@@ -392,11 +392,11 @@ ggsave(file = "output/fraud.png",
          dpi=72, width=2, height=1.5, scale=4)
 #Fraud in the ENARM?
 #http://2.bp.blogspot.com/_7k_XUBT5vbU/SPknrBDqtrI/AAAAAAAAADk/mYcQ5PIlUGg/s800/enarm0708.bmp
-#Secretaria de Marina, Escula M閐ico Naval 71 40 - 2007
+#Secretaria de Marina, Escula M茅dico Naval 71 40 - 2007
 #4 1 - 2008
 40/71
 1/4
-#Escuela M閐ico Militar Univ. Ejer y Fza Aerea 116 115 - 2007
+#Escuela M茅dico Militar Univ. Ejer y Fza Aerea 116 115 - 2007
 #2 0 - 2008
 115/116
 0
@@ -429,8 +429,8 @@ enarm.unam <- subset(enarm.all, University %in%
                        "UNAM FES Iztacala",
                        "Univ Panameriacana",
                        "Univ La Salle",
-                       "Inst Tecnol骻ico Est Sup Monterrey",
-                       "Univ. Aut. De Nuevo Le髇"))
+                       "Inst Tecnol贸gico Est Sup Monterrey",
+                       "Univ. Aut. De Nuevo Le贸n"))
 print(ggplot(enarm.all, aes(Medical.Score, English.Score,
                         label = University)) +
     geom_text(data = enarm.unam, aes(Medical.Score, English.Score,
